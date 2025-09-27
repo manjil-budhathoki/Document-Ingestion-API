@@ -3,3 +3,6 @@ uvicorn
 python-multipart
 PyMuPDF
 langchain-text-splitters
+sentence-transformers
+qdrant-client
+SQLAlchemy

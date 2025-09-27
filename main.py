@@ -1,18 +1,26 @@
 from fastapi import FastAPI
 from api import ingestion
+from services.database_service import metadata_db_service # Import the service
+
+# Add a startup event handler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # This code runs on startup
+    print("Initializing database...")
+    metadata_db_service.create_db_and_tables()
+    print("Database initialized.")
+    yield
+    # Code below yield runs on shutdown (if any needed)
 
 app = FastAPI(
     title="Document Ingestion API",
-    description="API for uploading documents and extracting text from them.",
+    description="An API to upload documents, extract text, and prepare for embedding.",
     version="1.0.0",
+    lifespan=lifespan # Attach the lifespan manager
 )
 
-
-# Include the router from the api.ingestion module
-# This makes all the routes defined in that router available in our app
 app.include_router(ingestion.router)
 
 @app.get("/", tags=["Root"])
 def read_root() -> dict:
-    """A simple root endpoint to confirm the API is running."""
     return {"message": "Welcome to the Document Ingestion API!"}
