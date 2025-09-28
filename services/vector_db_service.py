@@ -6,6 +6,8 @@ import uuid
 # This is crucial for setting up the Qdrant collection correctly.
 VECTOR_DIMENSION = 384
 
+QDRANT_COLLECTION_NAME = "documents_collection"
+
 class VectorDBService:
     """
     A service for interacting with the Qdrant vector database.
@@ -20,6 +22,7 @@ class VectorDBService:
         vectors: List[List[float]], 
         payloads: List[Dict[str, Any]]
     ):
+    
         """
         Upserts (inserts or updates) vectors into a Qdrant collection.
         If the collection does not exist, it will be created.
@@ -46,6 +49,23 @@ class VectorDBService:
             ),
             wait=True # Wait for the operation to complete
         )
+    def search(
+        self,
+        collection_name: str,
+        query_vector: List[float],
+        limit: int = 3
+    ) -> List[Dict[str, Any]]:
+        """
+        Searches for the most similar vectors in the collection.
+        """
+        search_result = self.client.search(
+            collection_name=collection_name,
+            query_vector=query_vector,
+            limit=limit,
+            with_payload=True
+        )
+
+        return [hit.payload for hit in search_result]
 
 # Create a single, reusable instance of the service.
 vector_db_service = VectorDBService()

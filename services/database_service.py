@@ -28,6 +28,17 @@ documents_table = Table(
     Column("ingested_at", DateTime, default=datetime.utcnow),
 )
 
+bookings_table = Table(
+    "interview_bookings",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("name", String, nullable=False),
+    Column("email", String, nullable=False),
+    Column("booking_date", String, nullable=False),
+    Column("booking_time", String, nullable=False),
+    Column("booked_at", DateTime, default=datetime.utcnow),
+)
+
 # --- Service Class ---
 class MetadataDBService:
     def create_db_and_tables(self):
@@ -64,6 +75,17 @@ class MetadataDBService:
         with engine.connect() as conn:
             result = conn.execute(query)
             return result.fetchone()
+    
+
+    def add_booking(self, name: str, email: str, date: str, time: str) -> int:
+        """Adds a new interview booking record to the database."""
+        query = bookings_table.insert().values(
+            name=name, email=email, booking_date=date, booking_time=time
+        )
+        with engine.connect() as conn:
+            result = conn.execute(query)
+            conn.commit()
+            return result.inserted_primary_key[0]
 
 
 # Create a single, reusable instance of the service

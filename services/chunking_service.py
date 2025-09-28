@@ -43,7 +43,7 @@ def chunk_text(
     """
     Main function to chunk text and associate metadata with each chunk.
     """
-    # First, get the raw text chunks from the selected strategy
+    # get the raw text chunks from the selected strategy
     if strategy == ChunkingStrategy.RECURSIVE:
         raw_chunks = _chunk_text_recursively(text)
     elif strategy == ChunkingStrategy.FIXED_SIZE:
@@ -51,7 +51,7 @@ def chunk_text(
     else:
         raise ValueError("Invalid chunking strategy provided.")
 
-    # Now, create Chunk objects with metadata for each raw chunk
+    # create Chunk objects with metadata for each raw chunk
     processed_chunks = []
     for i, chunk_text in enumerate(raw_chunks):
         metadata = {

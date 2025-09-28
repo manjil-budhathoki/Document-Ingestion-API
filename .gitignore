@@ -1,0 +1,16 @@
+# --- Secrets ---
+# Ignore the environment file containing API keys.
+.env
+
+# --- Python artifacts ---
+# Ignore Python cache files and folders.
+__pycache__/
+*.pyc
+
+# --- Local Databases and Storage ---
+# Ignore the generated SQLite database file.
+ingestion_metadata.db
+*.db
+
+# Ignore the Docker volume data for Qdrant.
+qdrant_storage/

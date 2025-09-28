@@ -3,13 +3,12 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, status, Query
 from services.text_extractor import extract_text
 from services.chunking_service import chunk_text, ChunkingStrategy
 from services.embedding_service import embedding_service
-from services.vector_db_service import vector_db_service
-from services.database_service import metadata_db_service # Import the new service
+from services.vector_db_service import vector_db_service, QDRANT_COLLECTION_NAME
+from services.database_service import metadata_db_service
 
 router = APIRouter()
 
 ALLOWED_CONTENT_TYPES = ["application/pdf", "text/plain"]
-QDRANT_COLLECTION_NAME = "documents_collection"
 
 def compute_file_hash(file_content: bytes) -> str:
     """Computes the SHA256 hash of the file content."""
@@ -60,7 +59,13 @@ async def process_document( # Make the function async to read file content
         
         # --- 4. Embedding and Vector Storage ---
         chunk_texts = [chunk.chunk_text for chunk in chunks]
-        chunk_payloads = [chunk.metadata for chunk in chunks]
+
+        chunk_payloads = []
+        for chunk in chunks:
+            payload = chunk.metadata
+            payload['chunk_text'] = chunk.chunk_text # Explicitly add the text to the payload
+            chunk_payloads.append(payload)
+
         embeddings = embedding_service.generate_embeddings(chunk_texts)
         
         vector_db_service.upsert_vectors(
